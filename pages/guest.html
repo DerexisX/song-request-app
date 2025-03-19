@@ -6,14 +6,19 @@
   <title>Request a Song</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/guest.css">
-  <!-- Firebase -->
+  
+  <!-- Firebase SDK - Load from official CDN -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
   <div class="container">
     <h1>Request a Song</h1>
-    <form id="requestForm">
+    
+    <!-- Add a connection status indicator -->
+    <div id="connectionStatus" class="status">Connecting to database...</div>
+    
+    <form id="requestForm" style="display: none;">
       <div class="form-group">
         <label for="guestName">Your Name:</label>
         <input type="text" id="guestName" required>
@@ -28,13 +33,44 @@
       </div>
       <button type="submit" class="btn">Submit Request</button>
     </form>
+    
     <div id="status" class="status"></div>
     <div class="footer">
       <p>Are you the DJ? <a href="dj.html">Go to DJ console</a></p>
     </div>
   </div>
 
+  <!-- Load Firebase configuration first -->
   <script src="../js/firebase-config.js"></script>
-  <script src="../js/guest.js"></script>
+  
+  <!-- Then load the app code -->
+  <script>
+    // Wait for Firebase to initialize before loading the app
+    window.addEventListener('load', function() {
+      // Check if Firebase is loaded
+      if (typeof firebase === 'undefined') {
+        document.getElementById('connectionStatus').textContent = 'Error: Firebase SDK not loaded';
+        document.getElementById('connectionStatus').className = 'status error';
+        return;
+      }
+      
+      // Check if db is available
+      setTimeout(function() {
+        if (typeof window.db === 'undefined') {
+          document.getElementById('connectionStatus').textContent = 'Error: Database connection failed';
+          document.getElementById('connectionStatus').className = 'status error';
+        } else {
+          document.getElementById('connectionStatus').textContent = 'Connected to database';
+          document.getElementById('connectionStatus').className = 'status success';
+          document.getElementById('requestForm').style.display = 'block';
+          
+          // Now load the app script
+          var script = document.createElement('script');
+          script.src = '../js/guest.js';
+          document.body.appendChild(script);
+        }
+      }, 2000); // Give Firebase 2 seconds to initialize
+    });
+  </script>
 </body>
 </html>

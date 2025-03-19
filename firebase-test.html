@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Connection Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+    .success { background-color: #d4edda; color: #155724; }
+    .error { background-color: #f8d7da; color: #721c24; }
+    pre { background: #f4f4f4; padding: 10px; overflow: auto; }
+  </style>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <h1>Firebase Connection Test</h1>
+  
+  <div id="firebaseStatus" class="status">Checking Firebase...</div>
+  <div id="firestoreStatus" class="status">Checking Firestore...</div>
+  
+  <h2>Test Write</h2>
+  <button id="testWrite">Test Write to Firestore</button>
+  <div id="writeResult"></div>
+  
+  <h2>Test Read</h2>
+  <button id="testRead">Test Read from Firestore</button>
+  <div id="readResult"></div>
+  
+  <h2>Configuration</h2>
+  <pre id="configDisplay"></pre>
+  
+  <script>
+    // Replace with your Firebase configuration
+    const firebaseConfig = {
+  apiKey: "AIzaSyAx3BliYlpIlUMGh3N5c067oMo2TO4VC2s",
+  authDomain: "song-request-app-2790e.firebaseapp.com",
+  projectId: "song-request-app-2790e",
+  storageBucket: "song-request-app-2790e.firebasestorage.app",
+  messagingSenderId: "1064169039210",
+  appId: "1:1064169039210:web:66414cd21d426c01a9b113",
+  measurementId: "G-R2Z2F7XWSM"
+};
+    
+    document.getElementById('configDisplay').textContent = JSON.stringify(firebaseConfig, null, 2);
+    
+    // Initialize Firebase
+    try {
+      firebase.initializeApp(firebaseConfig);
+      document.getElementById('firebaseStatus').textContent = 'Firebase initialized successfully';
+      document.getElementById('firebaseStatus').className = 'status success';
+    } catch (error) {
+      document.getElementById('firebaseStatus').textContent = 'Firebase initialization failed: ' + error.message;
+      document.getElementById('firebaseStatus').className = 'status error';
+    }
+    
+    // Initialize Firestore
+    try {
+      const db = firebase.firestore();
+      document.getElementById('firestoreStatus').textContent = 'Firestore initialized successfully';
+      document.getElementById('firestoreStatus').className = 'status success';
+      
+      // Test write
+      document.getElementById('testWrite').addEventListener('click', function() {
+        const writeResult = document.getElementById('writeResult');
+        writeResult.textContent = 'Writing to Firestore...';
+        
+        db.collection('test').add({
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          message: 'Test write at ' + new Date().toString()
+        })
+        .then(function(docRef) {
+          writeResult.textContent = 'Write successful! Document ID: ' + docRef.id;
+          writeResult.className = 'status success';
+        })
+        .catch(function(error) {
+          writeResult.textContent = 'Write error: ' + error.message;
+          writeResult.className = 'status error';
+        });
+      });
+      
+      // Test read
+      document.getElementById('testRead').addEventListener('click', function() {
+        const readResult = document.getElementById('readResult');
+        readResult.textContent = 'Reading from Firestore...';
+        
+        db.collection('test').orderBy('timestamp', 'desc').limit(5).get()
+        .then(function(querySnapshot) {
+          if (querySnapshot.empty) {
+            readResult.textContent = 'No documents found. Try writing first.';
+          } else {
+            let results = 'Documents found:\n';
+            querySnapshot.forEach(function(doc) {
+              results += '- ' + doc.id + ': ' + JSON.stringify(doc.data()) + '\n';
+            });
+            readResult.innerHTML = '<pre>' + results + '</pre>';
+            readResult.className = 'status success';
+          }
+        })
+        .catch(function(error) {
+          readResult.textContent = 'Read error: ' + error.message;
+          readResult.className = 'status error';
+        });
+      });
+    } catch (error) {
+      document.getElementById('firestoreStatus').textContent = 'Firestore initialization failed: ' + error.message;
+      document.getElementById('firestoreStatus').className = 'status error';
+    }
+  </script>
+</body>
+</html>

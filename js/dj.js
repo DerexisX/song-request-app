@@ -6,11 +6,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentFilter = 'all';
     
+    // Check if db is available
+    if (typeof window.db === 'undefined') {
+      console.error('Firestore db is not defined. Check firebase-config.js');
+      loadingElement.textContent = 'Error: Database connection failed';
+      return;
+    }
+    
     // Real-time listener for song requests
     function loadSongRequests() {
       loadingElement.classList.remove('hidden');
       
-      db.collection('songRequests')
+      window.db.collection('songRequests')
         .orderBy('timestamp', 'desc')
         .onSnapshot((snapshot) => {
           loadingElement.classList.add('hidden');
@@ -59,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, (error) => {
           console.error("Error getting song requests: ", error);
           loadingElement.classList.add('hidden');
+          loadingElement.textContent = `Error: ${error.message}`;
         });
     }
     
@@ -118,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update song request status
     function updateRequestStatus(id, status) {
-      db.collection('songRequests').doc(id).update({
+      window.db.collection('songRequests').doc(id).update({
         status: status
       })
       .catch((error) => {
@@ -128,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Delete song request
     function deleteRequest(id) {
-      db.collection('songRequests').doc(id).delete()
+      window.db.collection('songRequests').doc(id).delete()
       .catch((error) => {
         console.error("Error deleting song request: ", error);
       });
