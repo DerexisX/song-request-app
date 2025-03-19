@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DJ Console</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dj.css">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>DJ Console</h1>
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="pending">Pending</button>
+        <button class="filter-btn" data-filter="approved">Approved</button>
+        <button class="filter-btn" data-filter="played">Played</button>
+        <button class="filter-btn" data-filter="rejected">Rejected</button>
+      </div>
+    </header>
+    
+    <div class="song-requests">
+      <div class="loading">Loading requests...</div>
+      <table id="requestsTable">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Guest</th>
+            <th>Song</th>
+            <th>Artist</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="requestsList">
+          <!-- Songs will be populated here -->
+        </tbody>
+      </table>
+      <div id="noRequests" class="hidden">No song requests yet.</div>
+    </div>
+    
+    <div class="footer">
+      <a href="guest.html">Back to guest view</a>
+    </div>
+  </div>
+
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/dj.js"></script>
+</body>
+</html>
