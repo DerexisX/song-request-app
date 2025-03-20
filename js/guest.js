@@ -1,71 +1,65 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const requestForm = document.getElementById('requestForm');
-    const statusDiv = document.getElementById('status');
+  const requestForm = document.getElementById('requestForm');
+  const statusDiv = document.getElementById('status');
   
-    // Make sure Firebase is properly initialized before using it
-    if (typeof firebase === 'undefined') {
-      console.error('Firebase is not defined. Make sure firebase scripts are loaded properly.');
+  console.log('Guest JS loaded');
+  
+  // Check if Firebase is properly initialized
+  if (typeof firebase === 'undefined') {
+      console.error('Firebase is not defined');
       statusDiv.textContent = 'Error: Firebase SDK not loaded';
       statusDiv.className = 'status error';
       return;
-    }
+  }
   
-    // Check if db is available
-    if (typeof window.db === 'undefined') {
-      console.error('Firestore db is not defined. Check firebase-config.js');
+  console.log('Firebase detected');
+  
+  // Check if db is available
+  if (typeof window.db === 'undefined') {
+      console.error('Firestore db is not defined');
       statusDiv.textContent = 'Error: Database connection failed';
       statusDiv.className = 'status error';
       return;
-    }
+  }
   
-    requestForm.addEventListener('submit', function(e) {
-      e.preventDefault();
+  console.log('Firestore db detected');
+  
+  // Add form submission event listener
+  requestForm.addEventListener('submit', function(e) {
+      e.preventDefault(); // This prevents the page from refreshing
+      console.log('Form submitted');
       
       // Get form values
       const guestName = document.getElementById('guestName').value;
       const songTitle = document.getElementById('songTitle').value;
       const artist = document.getElementById('artist').value;
       
-      // Add logging to debug
-      console.log('Form submitted:', { guestName, songTitle, artist });
+      console.log('Form data:', { guestName, songTitle, artist });
       
-      try {
-        // Create timestamp
-        const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-        
-        // Add request to Firestore - use window.db instead of db
-        window.db.collection('songRequests').add({
+      // Add to Firestore
+      window.db.collection('songRequests').add({
           guestName: guestName,
           songTitle: songTitle,
           artist: artist,
-          timestamp: timestamp,
-          status: 'pending' // pending, approved, played, rejected
-        })
-        .then(() => {
-          // Show success message
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          status: 'pending'
+      })
+      .then(function(docRef) {
+          console.log('Document written with ID: ', docRef.id);
           statusDiv.textContent = 'Song request submitted successfully!';
           statusDiv.className = 'status success';
-          console.log('Request added to Firestore');
-          
-          // Reset form
           requestForm.reset();
           
           // Clear success message after 3 seconds
-          setTimeout(() => {
-            statusDiv.textContent = '';
-            statusDiv.className = 'status';
+          setTimeout(function() {
+              statusDiv.textContent = '';
+              statusDiv.className = 'status';
           }, 3000);
-        })
-        .catch((error) => {
-          console.error('Error adding request:', error);
-          // Show error message
-          statusDiv.textContent = `Error: ${error.message}`;
+      })
+      .catch(function(error) {
+          console.error('Error adding document: ', error);
+          statusDiv.textContent = 'Error: ' + error.message;
           statusDiv.className = 'status error';
-        });
-      } catch (error) {
-        console.error('Exception occurred:', error);
-        statusDiv.textContent = `Error: ${error.message}`;
-        statusDiv.className = 'status error';
-      }
-    });
+      });
   });
+});

@@ -7,9 +7,11 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/guest.css">
   
-  <!-- Firebase SDK - Load from official CDN -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <!-- Your Firebase config -->
+  <script src="../js/firebase-config.js"></script>
 </head>
 <body>
   <div class="container">
@@ -40,36 +42,41 @@
     </div>
   </div>
 
-  <!-- Load Firebase configuration first -->
-  <script src="../js/firebase-config.js"></script>
-  
-  <!-- Then load the app code -->
+  <!-- Only then, your application code -->
   <script>
     // Wait for Firebase to initialize before loading the app
     window.addEventListener('load', function() {
+      console.log('Page loaded');
+      
       // Check if Firebase is loaded
       if (typeof firebase === 'undefined') {
+        console.error('Firebase not loaded');
         document.getElementById('connectionStatus').textContent = 'Error: Firebase SDK not loaded';
         document.getElementById('connectionStatus').className = 'status error';
         return;
       }
       
+      console.log('Firebase loaded');
+      
       // Check if db is available
       setTimeout(function() {
         if (typeof window.db === 'undefined') {
+          console.error('DB not defined');
           document.getElementById('connectionStatus').textContent = 'Error: Database connection failed';
           document.getElementById('connectionStatus').className = 'status error';
         } else {
+          console.log('DB connection successful');
           document.getElementById('connectionStatus').textContent = 'Connected to database';
           document.getElementById('connectionStatus').className = 'status success';
+          document.getElementById('connectionStatus').style.display = 'none'; // Hide after successful connection
           document.getElementById('requestForm').style.display = 'block';
           
-          // Now load the app script
+          // Load the app script
           var script = document.createElement('script');
           script.src = '../js/guest.js';
           document.body.appendChild(script);
         }
-      }, 2000); // Give Firebase 2 seconds to initialize
+      }, 1000); // Give Firebase 1 second to initialize
     });
   </script>
 </body>
