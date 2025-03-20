@@ -15,14 +15,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Real-time listener for song requests
     function loadSongRequests() {
+      console.log('Loading song requests with filter:', currentFilter);
       loadingElement.classList.remove('hidden');
       
       window.db.collection('songRequests')
         .orderBy('timestamp', 'desc')
         .onSnapshot((snapshot) => {
+          console.log('Snapshot received, document count:', snapshot.size);
           loadingElement.classList.add('hidden');
           
           if (snapshot.empty) {
+            console.log('No documents found in collection');
             requestsList.innerHTML = '';
             noRequests.classList.remove('hidden');
             return;

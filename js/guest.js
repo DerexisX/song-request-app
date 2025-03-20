@@ -36,19 +36,33 @@ document.addEventListener('DOMContentLoaded', function() {
       
       console.log('Form data:', { guestName, songTitle, artist });
       
-      // Add to Firestore
-      window.db.collection('songRequests').add({
+      // Disable form while submitting
+      const submitButton = requestForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = 'Submitting...';
+      
+      // Create request object
+      const songRequest = {
           guestName: guestName,
           songTitle: songTitle,
           artist: artist,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
           status: 'pending'
-      })
+      };
+      
+      console.log('Sending to Firestore:', songRequest);
+      
+      // Add to Firestore
+      window.db.collection('songRequests').add(songRequest)
       .then(function(docRef) {
           console.log('Document written with ID: ', docRef.id);
           statusDiv.textContent = 'Song request submitted successfully!';
           statusDiv.className = 'status success';
           requestForm.reset();
+          
+          // Re-enable form
+          submitButton.disabled = false;
+          submitButton.textContent = 'Submit Request';
           
           // Clear success message after 3 seconds
           setTimeout(function() {
@@ -60,6 +74,10 @@ document.addEventListener('DOMContentLoaded', function() {
           console.error('Error adding document: ', error);
           statusDiv.textContent = 'Error: ' + error.message;
           statusDiv.className = 'status error';
+          
+          // Re-enable form
+          submitButton.disabled = false;
+          submitButton.textContent = 'Submit Request';
       });
   });
 });

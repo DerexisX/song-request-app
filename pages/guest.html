@@ -42,41 +42,59 @@
     </div>
   </div>
 
-  <!-- Only then, your application code -->
   <script>
     // Wait for Firebase to initialize before loading the app
-    window.addEventListener('load', function() {
+    document.addEventListener('DOMContentLoaded', function() {
       console.log('Page loaded');
+      const connectionStatus = document.getElementById('connectionStatus');
+      const requestForm = document.getElementById('requestForm');
       
       // Check if Firebase is loaded
       if (typeof firebase === 'undefined') {
         console.error('Firebase not loaded');
-        document.getElementById('connectionStatus').textContent = 'Error: Firebase SDK not loaded';
-        document.getElementById('connectionStatus').className = 'status error';
+        connectionStatus.textContent = 'Error: Firebase SDK not loaded';
+        connectionStatus.className = 'status error';
         return;
       }
       
       console.log('Firebase loaded');
       
-      // Check if db is available
-      setTimeout(function() {
+      // Verify database connection with a test read
+      function testDatabaseConnection() {
         if (typeof window.db === 'undefined') {
           console.error('DB not defined');
-          document.getElementById('connectionStatus').textContent = 'Error: Database connection failed';
-          document.getElementById('connectionStatus').className = 'status error';
-        } else {
-          console.log('DB connection successful');
-          document.getElementById('connectionStatus').textContent = 'Connected to database';
-          document.getElementById('connectionStatus').className = 'status success';
-          document.getElementById('connectionStatus').style.display = 'none'; // Hide after successful connection
-          document.getElementById('requestForm').style.display = 'block';
-          
-          // Load the app script
-          var script = document.createElement('script');
-          script.src = '../js/guest.js';
-          document.body.appendChild(script);
+          connectionStatus.textContent = 'Error: Database connection failed';
+          connectionStatus.className = 'status error';
+          return false;
         }
-      }, 1000); // Give Firebase 1 second to initialize
+        
+        // Test read operation
+        window.db.collection('test').get()
+          .then(() => {
+            console.log('Database connection verified');
+            connectionStatus.textContent = 'Connected to database';
+            connectionStatus.className = 'status success';
+            
+            // Hide status and show form after short delay
+            setTimeout(() => {
+              connectionStatus.style.display = 'none';
+              requestForm.style.display = 'block';
+            }, 500);
+            
+            // Load guest.js now that we know the database is working
+            const script = document.createElement('script');
+            script.src = '../js/guest.js';
+            document.body.appendChild(script);
+          })
+          .catch(error => {
+            console.error('Database connection test failed:', error);
+            connectionStatus.textContent = 'Error: Database connection test failed - ' + error.message;
+            connectionStatus.className = 'status error';
+          });
+      }
+      
+      // Allow time for Firebase to initialize
+      setTimeout(testDatabaseConnection, 1500);
     });
   </script>
 </body>

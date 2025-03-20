@@ -25,14 +25,23 @@ try {
   window.db = firebase.firestore();
   console.log("Firestore db created successfully");
   
-  // Test the connection
-  window.db.collection('test').get()
-    .then(() => {
-      console.log("Firestore connection verified");
-    })
-    .catch(error => {
-      console.error("Firestore connection test failed:", error);
-    });
+  // Ensure test collection exists
+  window.db.collection('test').doc('connection_test').set({
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    message: 'Connection test document'
+  })
+  .then(() => {
+    console.log("Test collection initialized");
+    
+    // Test the connection
+    return window.db.collection('test').get();
+  })
+  .then(() => {
+    console.log("Firestore connection verified");
+  })
+  .catch(error => {
+    console.error("Firestore operation failed:", error);
+  });
   
 } catch (error) {
   console.error("Error during Firebase initialization:", error);
