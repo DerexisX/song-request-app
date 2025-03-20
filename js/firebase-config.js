@@ -1,12 +1,4 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getDatabase, ref, set, onValue } from "firebase/database";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAx3BliYlpIlUMGh3N5c067oMo2TO4VC2s",
   authDomain: "song-request-app-2790e.firebaseapp.com",
@@ -22,7 +14,7 @@ try {
   console.log("Attempting to initialize Firebase with config:", firebaseConfig);
   
   // Check if Firebase is already initialized
-  if (!firebase.apps.length) {
+  if (!firebase.apps || !firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
     console.log("Firebase initialized successfully");
   } else {
@@ -44,10 +36,5 @@ try {
   
 } catch (error) {
   console.error("Error during Firebase initialization:", error);
-  alert("Firebase initialization failed. Check console for details.");
-}
-try {
-  // Your Firebase code
-} catch (error) {
   console.error("Detailed error:", error.message, error.code);
 }
